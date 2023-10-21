@@ -26,7 +26,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
    // Configura CORS
    app.enableCors({
-    origin: 'https://riopet.web.app/', // Cambia esto a tu origen deseado
+    origin: ['https://riopet.web.app/', 'http://localhost:3001'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
