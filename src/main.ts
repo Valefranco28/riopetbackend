@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as fs from 'fs';
+import * as https from 'https';
 
 // Import firebase-admin
 import * as admin from 'firebase-admin';
@@ -21,16 +23,22 @@ async function bootstrap() {
       databaseURL: 'https://riopet.firebaseio.com',
       storageBucket: 'gs://riopet.appspot.com',
     });
+
+    const httpsOptions = {
+      key: fs.readFileSync('key.pem'),
+      cert: fs.readFileSync('cert.pem'),
+    };
   
 
   const app = await NestFactory.create(AppModule);
    // Configura CORS
    app.enableCors({
-    origin: ['https://riopet.web.app/', 'http://localhost:3001'],
+    origin: ['https://riopet.web.app/', 'http://localhost:3001', ''], 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  await app.listen(3000);
+  const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
+  await server.listen(443); 
 }
 bootstrap();
