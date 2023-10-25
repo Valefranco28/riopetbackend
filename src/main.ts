@@ -1,8 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as fs from 'fs';
-import * as https from 'https';
-import * as path from 'path';
 
 // Import firebase-admin
 import * as admin from 'firebase-admin';
@@ -22,27 +19,19 @@ async function bootstrap() {
   admin.initializeApp({
     credential: admin.credential.cert(adminConfig),
     databaseURL: 'https://riopet.firebaseio.com',
-    storageBucket: 'gs://riopet.appspot.com',
+    storageBucket: 'gs://rio-pet.appspot.com',
   });
 
-  const certPath = path.join('src/', 'cert.pem'); // Construye la ruta completa al archivo 'cert.pem'
-  const keyPath = path.join('src/', 'key.pem');
-
-  const httpsOptions = {
-    key: fs.readFileSync(keyPath),
-    cert: fs.readFileSync(certPath),
-  };
 
 
   const app = await NestFactory.create(AppModule);
-  // Configura CORS
-  app.enableCors({
-    origin: ['https://riopet.web.app/', 'http://localhost:3001', ''],
+   // Configura CORS
+   app.enableCors({
+    origin: 'http://localhost:3001', // Cambia esto a tu origen deseado
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
-  await server.listen(3000);
+  await app.listen(3000);
 }
 bootstrap();
