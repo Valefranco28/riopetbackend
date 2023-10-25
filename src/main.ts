@@ -43,6 +43,6 @@ async function bootstrap() {
   });
 
   const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
-  await server.listen(3000);
+  await server.listen(443);
 }
 bootstrap();
