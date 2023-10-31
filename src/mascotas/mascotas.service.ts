@@ -128,7 +128,7 @@ export class MascotasService {
       const stream = fileUpload.createWriteStream({
         metadata: {
           contentType: file.mimetype,
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
         },
       });
 
