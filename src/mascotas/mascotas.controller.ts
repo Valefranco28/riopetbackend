@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { MascotasService } from './mascotas.service';
 import { CreatePetDto, UpdatePetDto } from 'src/commons/dto/pet.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -13,8 +13,12 @@ export class MascotasController {
     @Post()
     @UseGuards(AuthGuardAdmin)
     @UseInterceptors(FileInterceptor('image'))
-    async register(@UploadedFile() image: Express.Multer.File, @Body(new ValidationPipe()) petData: CreatePetDto) {
-    const uid = this.mascotasService.createPet(petData, image, 'pets');    
+    async register(@UploadedFile() image: Express.Multer.File, @Body(new ValidationPipe()) petData: CreatePetDto,  @Req() request: Request,) {
+    const headers = request.headers;
+    const authorizationHeader = headers['authorization'];
+    const token = authorizationHeader?.replace('Bearer ', '');
+
+    const uid = this.mascotasService.createPet(petData, image, 'pets', token);    
     return uid;
    }
 

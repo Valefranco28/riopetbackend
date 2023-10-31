@@ -12,10 +12,10 @@ export class MascotasService {
     this.#collection = this.#db.collection('pets');
   }
 
-  async createPet(pet: Pet, file: Express.Multer.File, folder: string): Promise<string> {
+  async createPet(pet: Pet, file: Express.Multer.File, folder: string, token: string): Promise<string> {
 
     if(file !== undefined){
-      const imageUrl = await this.uploadImage(file, folder);
+      const imageUrl = await this.uploadImage(file, folder, token);
       pet.image = imageUrl;
     }
     try {
@@ -77,7 +77,7 @@ export class MascotasService {
 
   async updateMascota(pet: PetWithDoc, file: Express.Multer.File, folder: string): Promise<void> {
     if(file !== undefined){
-      const imageUrl = await this.uploadImage(file, folder);
+      const imageUrl = await this.uploadImage(file, folder, 'token');
       pet.image = imageUrl;
     }
 
@@ -120,7 +120,7 @@ export class MascotasService {
     }
   }
 
-  async uploadImage(file: Express.Multer.File, folder: string): Promise<string> {
+  async uploadImage(file: Express.Multer.File, folder: string, token: string): Promise<string> {
     try {
       const bucket = this.firebaseApp.storage().bucket();
       const fileName = `${folder}/${Date.now()}_${file.originalname}`;
@@ -128,6 +128,7 @@ export class MascotasService {
       const stream = fileUpload.createWriteStream({
         metadata: {
           contentType: file.mimetype,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -136,8 +137,8 @@ export class MascotasService {
         stream.on('finish', async () => {
           // The file has been successfully uploaded, now get the download URL.
           const [url] = await fileUpload.getSignedUrl({
-            action: 'read',
-            expires: '2099-12-31', // Set an expiration date if needed
+            expires: '12-12-2099',
+            action: 'read'
           });
           resolve(url);
         });
